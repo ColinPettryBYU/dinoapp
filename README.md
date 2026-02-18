@@ -1,73 +1,123 @@
-# Welcome to your Lovable project
+# Dino Camp Roster
 
-## Project info
+Full-stack roster app with a React frontend and an Express + PostgreSQL backend.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Project Structure
 
-## How can I edit this code?
+- `frontend/`: React + Vite UI (`http://localhost:8080`)
+- `backend/`: Express API (`http://localhost:3001`)
+- `db/`: SQL scripts for schema and seed data
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- Frontend: React, TypeScript, Vite, Tailwind, shadcn/ui, React Query
+- Backend: Node.js, Express, `pg`, `dotenv`
+- Database: PostgreSQL
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Prerequisites
 
-Changes made via Lovable will be committed automatically to this repo.
+- Node.js 18+ and npm
+- PostgreSQL running locally on port `5432`
+- `psql` CLI available in your terminal
 
-**Use your preferred IDE**
+## Initial Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Install dependencies:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+```bash
+cd frontend && npm install
+cd ../backend && npm install
+cd ..
+```
 
-Follow these steps:
+2. Create backend environment file:
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+```bash
+cp backend/.env.example backend/.env
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+3. Edit `backend/.env` and set valid database credentials:
 
-# Step 3: Install the necessary dependencies.
-npm i
+```env
+PORT=3001
+DATABASE_URL=postgres://YOUR_DB_USER:YOUR_DB_PASSWORD@localhost:5432/dinocamp
+```
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+Note: If your password contains special characters (like `!`), URL-encode them in `DATABASE_URL` (example: `!` becomes `%21`).
+
+4. Create and seed the database:
+
+```bash
+psql -h localhost -U YOUR_DB_USER -d postgres -c "CREATE DATABASE dinocamp;"
+psql -h localhost -U YOUR_DB_USER -d dinocamp -f db/schema.sql
+psql -h localhost -U YOUR_DB_USER -d dinocamp -f db/seed.sql
+```
+
+## Run the App (Split Terminal)
+
+Use two terminal tabs/windows.
+
+Terminal 1 (backend):
+
+```bash
+cd backend
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+Terminal 2 (frontend):
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+cd frontend
+npm run dev
+```
 
-**Use GitHub Codespaces**
+Open `http://localhost:8080`.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## API Endpoints
 
-## What technologies are used for this project?
+- `GET /health`: backend + DB health check
+- `GET /users`: list users
+- `PATCH /users/:id`: update user `username`
 
-This project is built with:
+## Common Questions / Troubleshooting
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### `psql: command not found`
 
-## How can I deploy this project?
+- Install PostgreSQL CLI (macOS Homebrew): `brew install postgresql@16`
+- Add to PATH if needed: `export PATH="/opt/homebrew/opt/postgresql@16/bin:$PATH"`
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Frontend loads but user edits reset after refresh
 
-## Can I connect a custom domain to my Lovable project?
+- Ensure backend is running on port `3001`
+- Ensure request succeeds in browser network tab: `PATCH /users/:id`
+- Ensure database credentials in `backend/.env` are valid
 
-Yes, you can!
+### Backend says database auth failed
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- Verify credentials by direct login:
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+```bash
+psql -h localhost -U YOUR_DB_USER -d dinocamp
+```
+
+- If that fails, reset the database user password in PostgreSQL and update `backend/.env`.
+
+### Frontend cannot reach backend (CORS or connection errors)
+
+- Confirm backend is running: `curl http://localhost:3001/health`
+- Confirm frontend uses API base URL `http://localhost:3001` (default in code)
+- Restart both dev servers after env/config changes
+
+## Useful Commands
+
+- Backend health:
+
+```bash
+curl http://localhost:3001/health
+```
+
+- List users:
+
+```bash
+curl http://localhost:3001/users
+```

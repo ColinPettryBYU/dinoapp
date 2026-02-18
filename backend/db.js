@@ -1,0 +1,18 @@
+import dotenv from "dotenv";
+import pg from "pg";
+
+dotenv.config();
+
+const { Pool } = pg;
+
+const pool = process.env.DATABASE_URL
+  ? new Pool({ connectionString: process.env.DATABASE_URL })
+  : new Pool({
+      host: process.env.PGHOST || "localhost",
+      port: Number(process.env.PGPORT || 5432),
+      user: process.env.PGUSER || "postgres",
+      password: process.env.PGPASSWORD || "postgres",
+      database: process.env.PGDATABASE || "dinocamp",
+    });
+
+export default pool;
